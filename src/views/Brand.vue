@@ -107,7 +107,7 @@ export default {
           hoverAnimation: true,
           itemStyle: {
             normal: {
-              color:'orange',//设置水滴的颜色'rgb(255,160,122)'
+              color:'#F4A460',//设置水滴的颜色'rgb(255,160,122)'
               shadowBlur: 30,
               shadowColor: '#833'
             }
@@ -117,9 +117,10 @@ export default {
             formatter(params) {                
               return `${params.data.value[3] +":"+ params.data.name}`;
             },
-            color: 'white', //调整显示字体的颜色（当前为红色）'#FFDC6C'
-            fontSize: 12, //调整显示字体的大小
-            position: 'right',
+            color: 'white', //调整显示字体的颜色（当前为红色）'#FFDC6C'  '#F08080'
+            fontSize: 10, //调整显示字体的大小
+            position: 'top',
+            fontWeight: 'bolder',//bolder
             show: true
           },
           showEffectOn: 'render'
