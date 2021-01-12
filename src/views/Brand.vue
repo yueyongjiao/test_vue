@@ -13,34 +13,29 @@
 </template>
 
 <script>
-import '@/assets/js/flexible'
-// import '@/assets/js/sichuan'
-import echarts from "echarts"
-import axios from 'axios'
-import geoJson from "../assets/js/sichuan";
 
+import echarts from "echarts" //必须安装echarts组件
+import geoJson from "../assets/js/sichuan.js";//必须的地图文件
 export default {
   inject: ['reload'],
   name: 'Brand',  
   data() {
-  	return {
-  	}
+  	return {      
+    }
+  },
+  props:{
+    dataJson: Array
   },
   mounted() {
     this.getEchart();
+
   },
   methods: {
      getEchart() { // 初始化地图数据
       let myChart = echarts.init(document.getElementById('chart_map'));
       echarts.registerMap("sichuan", geoJson, this.brcd);
       let  pointData = [], sum = 0;
-      // pointData.push({
-         //name: item.properties.name,
-        // name: "省分行机构",
-       //  value: [103.800000, 30.790200, 0],
-       //  cityCode: 510108,
-       //  context : []
-      // })
+
        geoJson.features.push({"properties":{
            "name": "省分行机构",
            "center":[103.800000, 30.790200, 0],
@@ -51,53 +46,19 @@ export default {
       geoJson.features.forEach(item => {
         let value = Math.random() * 3000
         let  context = [],brname = null
-        pointData.push({
-          //name: item.properties.name,
-          name: brname,
-          value: [item.properties.center[0], item.properties.center[1], value],
-          cityCode: item.properties.adcode,
-          context : context
-        })
-        sum += value
       })
+      var convertData = function(data) {
+      var res = [];
+        for (var a in data) {
+          res.push({
+          name:a,
+          value:data[a]
+          });
+        }
+        return res;
+      };
       let option = {
-        //tooltip:提示框组件,最上层为全局，也可以下倒每已层
         backgroundColor: 'rgb(255,255,255)',
-        tooltip: {
-          //trigger:触发类型 item:图形类
-          trigger: "item",
-          //formatter: 提示框浮层内容格式器，支持字符串模板和回调函数两种形式。
-          formatter: (params, ticket, callback) => {
-            if (params.seriesType === "effectScatter") {
-              //return  "\<br />" + params.data.context.toString();
-              let revalue = ""
-              let j = 0
-              //alert("kkk:"+params.data.context.toString());
-              revalue = params.data.name + "\<br />";
-              params.data.context.forEach((item,i)=>{
-                if ( j < 9 ){
-                  let m = 0
-                  branchJson.forEach(item2=>{
-                    if ( item === item2.name){
-                      revalue = revalue + item + ":" + item2.value + "\<br />";
-                      j++;
-                      m=1;
-                      //alert("ddd:"+revalue);
-                      return true;
-                    }
-                  })
-                  if ( m === 0 )
-                      revalue = revalue + item  + ":" + "未知网点" + "\<br />";
-                }
-                if  (j === 9){
-                  revalue = revalue + ".....";
-                  j++;
-                }
-              })
-              return  revalue;
-            }
-          }
-        },
         geo: {
           map: "sichuan",
           label: {
@@ -116,13 +77,9 @@ export default {
             }
           },
           roam: false,
-          //   放大我们的地图
           zoom: 1,
           itemStyle: {
             normal: {
-              // areaColor: "rgba(43, 196, 243, 0.42)",
-              // areaColor: "rgba(0, 255, 0, 0)",
-              // areaColor: "rgb(123,104,238)",
               areaColor: "rgb(0,191,255)",
               shadowColor: "rgb(65,105,225)",
               shadowBlur: 20,
@@ -132,18 +89,16 @@ export default {
               borderWidth: 0.5
             },
             emphasis: {
-              // areaColor: "#2B91B7"
-              areaColor: "rgb(65,105,225)"
+              areaColor: "rgb(65,105,225)"//点击时的颜色"rgb(65,105,225)"
             }
           }
         },
         
         series: [{
           name: '散点',
-          // type: 'effectScatter',
           type: 'scatter',
           symbol: 'pin',//点的形状（水滴）
-          symbolSize:[80, 80], //水滴大小
+          symbolSize:18, //水滴大小
           
           coordinateSystem: 'geo',
           rippleEffect: {
@@ -152,35 +107,27 @@ export default {
           hoverAnimation: true,
           itemStyle: {
             normal: {
-             //color: '#00ff00', 绿色
-              color:function(params) {
-                // build a color map as your need.
-                if ( params.data.context.length > 0 ){
-                  return '#F4E925';
-                }
-                else{
-                  return 'rgb(255,160,122)';
-                }
-              },
+              color:'orange',//设置水滴的颜色'rgb(255,160,122)'
               shadowBlur: 30,
               shadowColor: '#833'
             }
+          },         
+          data: convertData(this.dataJson),
+          label: {
+            formatter(params) {                
+              return `${params.data.value[3] +":"+ params.data.name}`;
+            },
+            color: 'white', //调整显示字体的颜色（当前为红色）'#FFDC6C'
+            fontSize: 12, //调整显示字体的大小
+            position: 'right',
+            show: true
           },
-          symbolSize: function(val){
-            let value = val[2];
-            if (value > 50) {
-              return 18
-            }
-            return 12
-          },
-          data: pointData,
-          showEffectOn: 'render', //加载完毕显示特效
+          showEffectOn: 'render'
         }
         ]
       }
 
       myChart.setOption(option, true);
-
       window.addEventListener("resize", () => {
         myChart.resize();
       });

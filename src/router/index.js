@@ -7,7 +7,7 @@ const routes = [
   {
     path: '/',
     name: 'brand',
-    component: () => import('@/views/Brand.vue'),
+    component: () => import('@/views/home.vue'),
     meta: {
       title: '监控首页'
     }
